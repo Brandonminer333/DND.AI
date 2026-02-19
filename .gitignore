@@ -1,0 +1,4 @@
+.env
+discord.log
+sessions/
+__pycache__/
