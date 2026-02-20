@@ -3,6 +3,7 @@
 Generate 2–4 DM-facing suggestions based on the current session state.
 
 Each suggestion should be:
+
 - Short
 - Actionable
 - Easy to improvise

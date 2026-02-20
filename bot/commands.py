@@ -1,6 +1,10 @@
 # Slash commands
 
+import time
+
 from discord.ext import commands
+
+from mvp import *
 
 
 class NotInVoiceChannelError(Exception):
@@ -53,8 +57,30 @@ class CommandsCog(commands.Cog):
             await ctx.send(f"Left {channel_name}")
         
         except NotInVoiceChannelError as e:
-            await ctx.send(f"{e}")
-    
+            await ctx.send(f"{e}")    
+
+    @commands.command(name='listen')
+    async def listen(self, ctx, arg):
+        """Start local runtime listening
+        Local device must be in voice channel, not the bot"""
+        # TODO identify exception types and make one try many excepts
+        if arg is None:
+            arg = 5
+            ctx.send("Not time given, defaulting to 5 seconds")
+        try:
+            t = int(arg)
+            await start_recording(output_file="../data/output.wav")
+            time.sleep(time)
+            await stop_recording()
+            ctx.send(f"Done listening for {t} seconds")
+
+        except (ValueError, TypeError) as e:
+            await ctx.send(f"Error: invalid number of seconds {e}")
+        except:
+            ctx.send("Failed to start listening")
+
+
+
 
 async def setup(bot: commands.Bot):
     """Setup function called when the cog is loaded."""
