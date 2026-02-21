@@ -2,3 +2,4 @@
 discord.log
 sessions/
 __pycache__/
+.DS_Store
