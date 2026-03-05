@@ -37,7 +37,7 @@ def save_transcript(text: str, output_path) -> None:
 
 
 # TODO remove temp
-def test():
+def example():
     try:
         txt = transcribe_audio(
             "/Users/brandonminer/Projects/DND.AI/data/audio/test.wav")
@@ -51,4 +51,4 @@ def test():
 
 
 if __name__ == "__main__":
-    print(test())
+    print(example())
