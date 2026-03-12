@@ -5,22 +5,22 @@ from google import genai
 
 
 def get_prompt(context, summary=True):
-    with open('prompts/suggest.md', 'r') as f:
+    with open('../prompts/suggest.md', 'r') as f:
         prompt = f.read()
 
     if summary:
-        with open(f'data/summaries/{context}.md', 'r') as f:
+        with open(f'../data/summaries/{context}.md', 'r') as f:
             summary = f.read()
         prompt = prompt + "\n\n" + summary
 
-    with open(f'data/transcripts/{context}.md', 'r') as f:
+    with open(f'../data/transcripts/{context}.md', 'r') as f:
         prompt = prompt + "\n\n" + f.read()
 
     return prompt
 
 
 def suggest(client, prompt, model_name="gemini-2.5-flash"):
-    with open('prompts/suggest.md', 'r') as f:
+    with open('../prompts/suggest.md', 'r') as f:
         suggest_prompt = f.read()
 
     prompt = suggest_prompt + "\n\n" + prompt

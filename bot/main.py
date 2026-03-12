@@ -4,7 +4,7 @@ import logging
 import discord
 from dotenv import load_dotenv
 
-from bot.client import Bot as DiscordBot
+from bot.client import DiscordBot
 
 
 # Load environment variables
@@ -25,4 +25,5 @@ intents.message_content = True
 
 
 bot = DiscordBot(command_prefix="/", intents=intents)
-bot.run(token, log_handler=handler, log_level=logging.DEBUG)
+# bot.run(token, log_handler=handler, log_level=logging.DEBUG)
+bot.run(token)
