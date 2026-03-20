@@ -1,0 +1,22 @@
+name: dnd-ai
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.12
+
+  - pip
+  - pip:
+      - "apache-airflow==2.10.4"
+      - "fastapi[standard]==0.115.12"
+      - "uvicorn[standard]"
+      - "pydantic==2.9.2"
+      - "requests"
+      - "pandas"
+      - "python-dotenv"
+      - "google-genai"
+      - "sounddevice"
+      - "webrtcvad"
+      - "numpy"
+      - "openai-whisper"
+      - "apache-airflow[postgres]"

@@ -1,8 +1,9 @@
 from google import genai
-from fastapi import FastAPI, Query
 from dotenv import load_dotenv
+from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
 
+from audio import record
 from suggest import get_prompt, suggest
 
 
@@ -36,3 +37,12 @@ def suggest_endpoint(context: str = Query(...)):
     print(suggestions)
 
     return {"suggestion": suggestions}
+
+
+@app.post("/record")
+async def start_recording():
+    try:
+        record()
+        return {"state": "Success"}
+    except:
+        return {"state": "Failure!"}
