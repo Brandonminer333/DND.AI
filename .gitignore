@@ -1,11 +1,14 @@
 .env
-discord.log
-sessions/
 __pycache__/
 .DS_Store
+
 logs
 airflow.cfg
 airflow.db
 airflow-webserver.pid
 webserver_config.py
+gunicorn.ctl
 !airflow/dags
+
+*.wav
+*.txt

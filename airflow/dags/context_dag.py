@@ -2,10 +2,8 @@
 
 # fmt: off
 # isort: off
-import sys
-from datetime import datetime, timedelta
 
-sys.path.insert(0, '/Users/brandonminer/projects/dnd-ai')
+from datetime import datetime, timedelta
 
 from airflow import DAG
 from airflow.sensors.filesystem import FileSensor
