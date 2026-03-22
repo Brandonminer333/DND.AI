@@ -1,5 +1,4 @@
 # context/transcribe.py
-import glob
 import os
 import warnings
 from pathlib import Path
@@ -9,20 +8,32 @@ from whisper import load_model
 warnings.filterwarnings(
     "ignore", message="FP16 is not supported on CPU; using FP32 instead")
 
-model = load_model("small")
-
-AUDIO_GLOB = "/Users/brandonminer/projects/dnd-ai/data/audio/*.wav"
-TRANSCRIPT_DIR = Path("/Users/brandonminer/projects/dnd-ai/data/transcript")
+model = None
 
 
-def transcribe_audio(**context):
+def get_model(size="small"):
+    global model
+    if model is None:
+        model = load_model(size)
+    return model
+
+
+def transcribe_audio():
     """
     Finds all .wav files in the audio dir, transcribes each,
     saves transcripts, deletes source audio, and pushes transcript
     paths to XCom for the next task.
     """
-    ti = context['ti']
-    audio_files = glob.glob(AUDIO_GLOB)
+
+    model = get_model()
+
+    AUDIO_GLOB = "/Users/brandonminer/projects/dnd-ai/data/audio/*.wav"
+    TRANSCRIPT_DIR = Path(
+        "/Users/brandonminer/projects/dnd-ai/data/transcript")
+
+    audio_files = [
+        "/Users/brandonminer/projects/dnd-ai/data/audio/" + name for name in os.listdir(
+            "/Users/brandonminer/projects/dnd-ai/data/audio") if not ".DS_Store"]
 
     if not audio_files:
         raise FileNotFoundError(f"No audio files found matching: {AUDIO_GLOB}")
@@ -45,10 +56,6 @@ def transcribe_audio(**context):
         except Exception as e:
             print(f"Failed to transcribe {file_path}: {e}")
 
-    # Push transcript paths so the next task can pick them up
-    ti.xcom_push(key="transcript_paths", value=transcript_paths)
-    return transcript_paths
-
 
 def save_transcript(text: str, source_path: Path, output_dir: Path) -> Path:
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -63,4 +70,4 @@ def save_transcript(text: str, source_path: Path, output_dir: Path) -> Path:
 if __name__ == "__main__":
     # files = os.listdir("data/audio")
     # for file in files:
-    transcribe_audio(ti="data/audio")
+    transcribe_audio()

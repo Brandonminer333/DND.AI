@@ -11,20 +11,31 @@ client = genai.Client(api_key=os.getenv("GEMINI_KEY"))
 model_name = model_name = "gemini-2.5-flash"
 
 
-def summarize_transcript(file_path: Path):
+def summarize_transcript():
     with open("/Users/brandonminer/Projects/dnd-ai/prompts/summarize.md", 'r') as file:
         prompt = file.read()
     try:
-        with open(file_path, 'r') as file:
-            text = file.read()
+        for file_path in [
+            "/Users/brandonminer/projects/dnd-ai/data/transcript/" + name for name in os.listdir(
+                "/Users/brandonminer/projects/dnd-ai/data/transcript")]:
 
-        prompt_content = f"{prompt}\nThe transcript is below:\n\n{text}"
+            with open(file_path, 'r') as file:
+                text = file.read()
 
-        summary = client.models.generate_content(
-            model=model_name,
-            contents=prompt_content
-        )
-        return summary.text
+            prompt_content = f"{prompt}\nThe transcript is below:\n\n{text}"
+
+            summary = client.models.generate_content(
+                model=model_name,
+                contents=prompt_content
+            )
+
+            output_path = file_path
+            output_path.replace("transcript", "summary")
+            with open(output_path, "w") as output:
+                output.write(summary.text)
+
+            os.remove(file_path)
+
     except Exception as e:
         print(e)
 

@@ -9,8 +9,8 @@ from airflow import DAG
 from airflow.sensors.filesystem import FileSensor
 from airflow.operators.python import PythonOperator
 
-from context.transcribe import transcribe_audio
-from context.summarize import summarize_transcript
+from prompt_context.transcribe import transcribe_audio
+from prompt_context.summarize import summarize_transcript
 
 # fmt: on
 # isort: on
@@ -31,7 +31,7 @@ with DAG(
     description='Transcribe and summarize audio files as they arrive',
     schedule_interval=timedelta(minutes=1),  # Poll frequently for new files
     catchup=False,
-    tags=['context'],
+    tags=['prompt_context'],
     max_active_runs=1,
     max_active_tasks=2
 ) as dag:
@@ -47,15 +47,6 @@ with DAG(
         timeout=60 * 60,               # Give up after 1 hour
     )
 
-    transcript_sensor = FileSensor(
-        task_id="wait_for_transcript",
-        filepath="data/transcript/*.txt",
-        fs_conn_id="fs_default",
-        mode="reschedule",
-        poke_interval=30,
-        timeout=60 * 60,
-    )
-
     task_transcribe = PythonOperator(
         task_id='transcribe_audio',
         python_callable=transcribe_audio,
@@ -65,7 +56,7 @@ with DAG(
     task_summarize = PythonOperator(
         task_id='summarize_transcript',
         python_callable=summarize_transcript,
+        execution_timeout=timedelta(minutes=10)
     )
 
-    audio_sensor >> task_transcribe
-    transcript_sensor >> task_summarize
+    audio_sensor >> task_transcribe >> task_summarize
