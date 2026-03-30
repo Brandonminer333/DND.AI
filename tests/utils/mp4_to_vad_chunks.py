@@ -12,6 +12,9 @@ Default output: `tests/data/audio/chunk_XXXX.wav` (directory is created if missi
 Example:
   python tests/mp4_to_vad_chunks.py /path/to/session.mp4
 
+Or set `SESSION_MP4` or `MP4_PATH`, or run with no args in a **terminal** to be prompted for the path.
+(IDE “Run” often has no TTY; then pass the path as the first argument or use env vars.)
+
 Optional overrides (same semantics as live `record()`):
   --silence-threshold   consecutive non-speech frames after speech starts before flush
   --min-chunk-frames    minimum voiced frames required to emit a chunk
@@ -22,10 +25,15 @@ Optional overrides (same semantics as live `record()`):
 from __future__ import annotations
 
 import argparse
+import os
 import subprocess
 import sys
+import warnings
 import wave
 from pathlib import Path
+
+# webrtcvad may trigger setuptools' pkg_resources deprecation on import; hide that noise.
+warnings.filterwarnings("ignore", category=UserWarning, message=".*pkg_resources.*")
 
 import webrtcvad
 
@@ -146,12 +154,19 @@ def segment_pcm_by_vad(
 
 def main() -> int:
     parser = argparse.ArgumentParser(
-        description="Split an MP4 into VAD/silence-based WAV chunks (logic aligned with api/audio.py)."
+        description="Split an MP4 into VAD/silence-based WAV chunks (logic aligned with api/audio.py).",
+        epilog=(
+            "With no MP4 argument: you are prompted in a terminal, or set SESSION_MP4 / MP4_PATH.\n"
+            "Example: python tests/mp4_to_vad_chunks.py ~/Videos/session.mp4"
+        ),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     parser.add_argument(
         "mp4_path",
+        nargs="?",
         type=Path,
-        help="Path to the session MP4",
+        default=None,
+        help="Path to the session MP4 (optional if SESSION_MP4 or MP4_PATH is set)",
     )
     parser.add_argument(
         "--output-dir",
@@ -180,7 +195,33 @@ def main() -> int:
     )
     args = parser.parse_args()
 
-    mp4 = args.mp4_path.expanduser().resolve()
+    mp4_raw = args.mp4_path
+    if mp4_raw is None:
+        env_path = os.environ.get("SESSION_MP4") or os.environ.get("MP4_PATH")
+        if env_path:
+            mp4_raw = Path(env_path)
+    if mp4_raw is None and sys.stdin.isatty():
+        # No arg and no env: prompt when run interactively (e.g. IDE Run without args).
+        try:
+            line = input("Path to MP4 (drag file into terminal to paste path): ").strip()
+        except EOFError:
+            line = ""
+        if line:
+            # Strip common paste wrappers: quotes or backslash-escaped spaces
+            line = line.strip().strip("'\"")
+            mp4_raw = Path(line)
+    if mp4_raw is None:
+        parser.print_help(file=sys.stderr)
+        print(
+            "\nError: no MP4 path. Use one of:\n"
+            "  • First argument: python tests/mp4_to_vad_chunks.py /path/to/session.mp4\n"
+            "  • Environment: SESSION_MP4 or MP4_PATH\n"
+            "  • Interactive: run again in a terminal (no args) to be prompted",
+            file=sys.stderr,
+        )
+        return 2
+
+    mp4 = mp4_raw.expanduser().resolve()
     if not mp4.is_file():
         print(f"Error: file not found: {mp4}", file=sys.stderr)
         return 1

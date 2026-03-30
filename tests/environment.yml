@@ -1,4 +1,5 @@
-name: dnd-ai
+# Optional secondary env for CI or test-only installs; primary env is ../environment.yml
+name: dnd-ai-test
 channels:
   - conda-forge
   - defaults
