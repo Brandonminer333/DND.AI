@@ -1,4 +1,6 @@
 # TODO
 
 1. Set up airflow
-2. 
+   1. Look as summarizer
+2. Set up ArangoDB
+    1. Integrate 

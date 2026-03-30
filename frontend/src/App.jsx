@@ -1,5 +1,10 @@
+import myImage from './assets/dnd-logo.png'
 import { useState } from 'react'
 import './App.css'
+
+function DnDLogo() {
+  return <img src={myImage} alt="D&D Logo" />;
+}
 
 function App() {
   const [response, setResponse] = useState(null);
@@ -65,6 +70,7 @@ function App() {
 
   return (
     <>
+    <DnDLogo />
       <div>
         {/* Conditionally render Start/Stop buttons based on state */}
         {!isRecording ? (

@@ -6,6 +6,7 @@
 from datetime import datetime, timedelta
 
 from airflow import DAG
+from airflow.operators.bash import BashOperator
 from airflow.sensors.filesystem import FileSensor
 from airflow.operators.python import PythonOperator
 
@@ -47,9 +48,9 @@ with DAG(
         timeout=60 * 60,               # Give up after 1 hour
     )
 
-    task_transcribe = PythonOperator(
+    task_transcribe = BashOperator(
         task_id='transcribe_audio',
-        python_callable=transcribe_audio,
+        bash_command='/opt/homebrew/Caskroom/miniconda/base/envs/dnd-ai/bin/python /Users/brandonminer/projects/dnd-ai/prompt_context/transcribe.py',
         execution_timeout=timedelta(minutes=10)
     )
 

@@ -10,5 +10,6 @@ webserver_config.py
 gunicorn.ctl
 !airflow/dags
 
+data/
 *.wav
 *.txt
